@@ -9,14 +9,9 @@ import SwiftUI
 
 struct SelectorView: View {
     
-    @State private var difficulty = "easy"
-    @State private var category = "9"
-    @State private var amount = 10
-    
-    @State private var navigateToTrivia = false
     @StateObject var triviaManager = TriviaManager()
     
-   
+    
     
     var body: some View {
         NavigationView {
@@ -45,7 +40,7 @@ struct SelectorView: View {
                                 .fontWeight(.heavy)
                                 .foregroundStyle(.white)
                             Spacer()
-                            Picker("Difficulty", selection: $difficulty) {
+                            Picker("Difficulty", selection: $triviaManager.difficulty) {
                                 ForEach(triviaManager.difficulties, id: \.self) { difficulty in
                                     Text(difficulty).tag(difficulty)
                                 }
@@ -60,7 +55,7 @@ struct SelectorView: View {
                                 .fontWeight(.heavy)
                                 .foregroundStyle(.white)
                             Spacer()
-                            Picker("Category", selection: $category) {
+                            Picker("Category", selection: $triviaManager.category) {
                                 ForEach(triviaManager.categories.keys.sorted(), id: \.self) { category in
                                     Text(category).tag(triviaManager.categories[category]!)
                                 }
@@ -79,7 +74,7 @@ struct SelectorView: View {
                             
                             
                             
-                            Picker("Question Number", selection: $amount) {
+                            Picker("Question Number", selection: $triviaManager.amount) {
                                 ForEach(triviaManager.questionAmount, id: \.self) { amount in
                                     Text("\(amount)").tag(amount)
                                 }
@@ -96,35 +91,19 @@ struct SelectorView: View {
                     NavigationLink(destination: TriviaView().environmentObject(triviaManager)
                         .onAppear() {
                             Task {
-                                await triviaManager.fetchTrivia(difficulty: difficulty, category: category, amount: amount)
-                                saveSettings()
+                                await triviaManager.fetchTrivia(difficulty: triviaManager.difficulty, category: triviaManager.category, amount: triviaManager.amount)
+                                triviaManager.saveSettings()
                             }
                         }
                     ) {
                         PrimaryButton(text: "Start Quiz")
                     }
-                        
-                    
-//                    Button {
-//                        Task {
-//                            await triviaManager.fetchTrivia(difficulty: difficulty.lowercased(), category: category, amount: amount)
-//                            navigateToTrivia = true
-//                        }
-//                    } label: {
-//                        PrimaryButton(text: "Start Quiz!")
-//                    }
                     
                 }
             }
         }
         .navigationBarHidden(true)
         
-    }
-    
-    func saveSettings() {
-        UserDefaults.standard.set(difficulty.lowercased(), forKey: "difficulty")
-        UserDefaults.standard.set(category, forKey: "category")
-        UserDefaults.standard.set(amount, forKey: "amount")
     }
 }
 

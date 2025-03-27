@@ -9,7 +9,10 @@ import SwiftUI
 
 class TriviaManager: ObservableObject {
     
+    // List of trivia questions fetched from the API
     private(set) var trivia: [Trivia.Result] = []
+    
+    // Notify the UI whenever their values change
     @Published private(set) var lenght = 0
     @Published private(set) var index = 0
     @Published private(set) var reachedEnd = false
@@ -19,6 +22,12 @@ class TriviaManager: ObservableObject {
     @Published private(set) var progress: CGFloat = 0.00
     @Published private(set) var score = 0
     
+    // Trivia settings
+    @Published var difficulty = "easy"
+    @Published var category = "9"
+    @Published var amount = 10
+    
+    // Dropdown Options
     let difficulties = ["easy", "medium", "hard"]
     let categories = [
         "General Knowledge": "9",
@@ -48,33 +57,21 @@ class TriviaManager: ObservableObject {
     ]
     let questionAmount = [5, 10, 15, 20, 25, 50]
     
-//    init() {
-//        Task.init {
-//            await fetchTrivia(difficulty: "easy", category: "9", amount: 10)
-//        }
-//    }
+    // Saving user settings
+    func saveSettings() {
+        UserDefaults.standard.set(difficulty.lowercased(), forKey: "difficulty")
+        UserDefaults.standard.set(category, forKey: "category")
+        UserDefaults.standard.set(amount, forKey: "amount")
+    }
     
-    var difficulty: String = "easy"
-    var category: String = "9"
-    var amount: Int = 10
     
+    // Fetching trivia data
     func fetchTrivia(difficulty: String, category: String, amount: Int) async {
-        
-//        let difficulty = UserDefaults.standard.string(forKey: "difficulty") ?? "easy"
-//        let category = UserDefaults.standard.string(forKey: "category") ?? "9"
-//        let amount = UserDefaults.standard.integer(forKey: "amount")
-        
-        self.difficulty = difficulty
-        self.category = category
-        self.amount = amount
-        
+
         guard let url = URL(string: "https://opentdb.com/api.php?amount=\(amount)&category=\(category)&difficulty=\(difficulty)") else { fatalError("Missing URL") }
-        
-        print(url)
         
         let urlRequest = URLRequest(url: url)
         
-                
         do {
             let (data, response) = try await URLSession.shared.data(for: urlRequest)
             
@@ -84,8 +81,6 @@ class TriviaManager: ObservableObject {
                 fatalError("Error while fetching data")
                 
             }
-            
-            
             
             // Decode JSON
             let decoder = JSONDecoder()
@@ -98,17 +93,23 @@ class TriviaManager: ObservableObject {
             
             // Update UI on Main Thread
             DispatchQueue.main.async {
+                
+                // Stores the selected difficulty
+                self.difficulty = difficulty
+                self.category = category
+                self.amount = amount
+                
+                // Resetting quiz state
                 self.index = 0
                 self.score = 0
                 self.progress = 0.00
                 self.reachedEnd = false
                 
+                // Storing fetched questions
                 self.trivia = decodedData.results
                 self.lenght = self.trivia.count
                 
-                print("fetched \(self.lenght) questions")
-                print(self.trivia)
-                
+                // Checking if Questions exists and setting the first question
                 if self.lenght > 0 {
                     self.setQuestion()
                 } else {
