@@ -36,6 +36,32 @@ struct ContentView: View {
                     PrimaryButton(text: "Let's Go!")
                 }
                 
+                //if triviaManager.getHighScore() > 0 {
+                    Text("Best Score")
+                        .formattedTitle()
+                        .foregroundStyle(.white)
+                ZStack {
+
+                    Image(systemName: "star.fill")
+                        .resizable()
+                        .frame(width: 80, height: 80)
+                        .foregroundStyle(.darkYellowBulb)
+                        .offset(x: -5)
+                    
+                        Text("\(triviaManager.getHighScore())")
+                        .formattedTitle()
+                        .foregroundStyle(.bluePrimary)
+                        .frame(width: 60, height: 60)
+                        .background(
+                            Image(systemName: "star.fill")
+                                .resizable()
+                                .foregroundStyle(.yellowBulb)
+                                .frame(width: 80, height: 80)
+                        )
+                    
+                    }
+                //}
+                
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Image("backgroundFoto")

@@ -63,6 +63,19 @@ class TriviaManager: ObservableObject {
     ]
     let questionAmount = [5, 10, 15, 20, 25, 50]
     
+    func saveHighScore() {
+        let currentScore = score
+        let savedScore = UserDefaults.standard.integer(forKey: "highScore")
+        
+        if currentScore > savedScore {
+            UserDefaults.standard.set(currentScore, forKey: "highScore")
+        }
+    }
+    
+    func getHighScore() -> Int {
+        return UserDefaults.standard.integer(forKey: "highScore")
+    }
+    
     // Saving user settings
     func saveSettings() {
         UserDefaults.standard.set(difficulty.lowercased(), forKey: "difficulty")
