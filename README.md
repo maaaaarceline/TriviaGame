@@ -11,5 +11,6 @@ Its features:
 - Progress tracking
 - Score tracking
 - Restart quiz
+- Timer on each question
 
 Build with SwiftUI
