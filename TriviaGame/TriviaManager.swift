@@ -22,6 +22,12 @@ class TriviaManager: ObservableObject {
     @Published private(set) var progress: CGFloat = 0.00
     @Published private(set) var score = 0
     
+    @Published var timeRemaining = 20
+    @Published private(set) var angle: Double = 0
+    @Published private(set) var fillAmount: CGFloat = 0
+    
+    private var timer: Timer?
+    
     // Trivia settings
     @Published var difficulty = "easy"
     @Published var category = "9"
@@ -67,7 +73,7 @@ class TriviaManager: ObservableObject {
     
     // Fetching trivia data
     func fetchTrivia(difficulty: String, category: String, amount: Int) async {
-
+        
         guard let url = URL(string: "https://opentdb.com/api.php?amount=\(amount)&category=\(category)&difficulty=\(difficulty)") else { fatalError("Missing URL") }
         
         let urlRequest = URLRequest(url: url)
@@ -93,6 +99,7 @@ class TriviaManager: ObservableObject {
             
             // Update UI on Main Thread
             DispatchQueue.main.async {
+                self.setQuestion()
                 
                 // Stores the selected difficulty
                 self.difficulty = difficulty
@@ -122,9 +129,37 @@ class TriviaManager: ObservableObject {
         }
     }
     
+    func starTimer() {
+        timer?.invalidate()
+        fillAmount = 0
+        angle = 0
+        
+        withAnimation(.easeOut(duration: 20)) {
+            fillAmount = 1
+            angle += 360
+        }
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
+            guard let self = self else { return }
+            if self.timeRemaining > 0 {
+                self.timeRemaining -= 1
+            } else {
+                self.timer?.invalidate()
+                resetTimerVisuals()
+                self.goToNextQuestion()
+            }
+        })
+    }
+    
+    func resetTimerVisuals() {
+        withAnimation {
+            fillAmount = 0
+            angle = 0
+        }
+    }
+    
     func restartTrivia() async {
         await fetchTrivia(difficulty: self.difficulty, category: self.category, amount: self.amount)
-        }
+    }
     
     func goToNextQuestion() {
         if index + 1 < lenght {
@@ -143,6 +178,8 @@ class TriviaManager: ObservableObject {
             let currentTriviaQuestion = trivia[index]
             question = currentTriviaQuestion.formattedQuestion
             answerChoices = currentTriviaQuestion.answers
+            timeRemaining = 20
+            starTimer()
         }
     }
     
@@ -151,5 +188,7 @@ class TriviaManager: ObservableObject {
         if answer.isCorrect {
             score += 1
         }
+        timer?.invalidate()
+        resetTimerVisuals()
     }
 }

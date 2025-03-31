@@ -10,6 +10,7 @@ import SwiftUI
 struct QuestionView: View {
     
     @EnvironmentObject var triviaGame: TriviaManager
+    @State var emaining = 15
     
     var body: some View {
         ZStack {
@@ -22,18 +23,23 @@ struct QuestionView: View {
                 
                 
                 HStack {
-                    Text("Trivia Game")
-                        .formattedTitle()
-                        .foregroundStyle(.white)
-                    
+                        Text("Trivia Game")
+                            .formattedTitle()
+                            .foregroundStyle(.white)
+
                     Spacer()
                     
+                    TimerView(angle: triviaGame.angle, fillAmount: triviaGame.fillAmount, timeRemaining: triviaGame.timeRemaining)
+                }
+                
+                VStack {
                     Text("\(triviaGame.index + 1) out of \(triviaGame.lenght)")
                         .foregroundStyle(Color(.white))
                         .fontWeight(.heavy)
+                    
+                    ProgressBar(progress: triviaGame.progress)
                 }
-                
-                ProgressBar(progress: triviaGame.progress)
+     
                 
                 VStack(alignment: .leading, spacing: 20) {
                     Text(triviaGame.question)
@@ -57,6 +63,9 @@ struct QuestionView: View {
                 
                 Spacer()
             }
+            .onAppear {
+                triviaGame.setQuestion()
+            }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarHidden(true)
@@ -65,6 +74,7 @@ struct QuestionView: View {
         
         
     }
+    
 }
 
 #Preview {

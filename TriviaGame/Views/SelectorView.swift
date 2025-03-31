@@ -11,8 +11,6 @@ struct SelectorView: View {
     
     @StateObject var triviaManager = TriviaManager()
     
-    
-    
     var body: some View {
         NavigationView {
             
