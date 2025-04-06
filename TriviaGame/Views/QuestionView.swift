@@ -10,7 +10,6 @@ import SwiftUI
 struct QuestionView: View {
     
     @EnvironmentObject var triviaGame: TriviaManager
-    @State var emaining = 15
     
     var body: some View {
         ZStack {
@@ -19,7 +18,7 @@ struct QuestionView: View {
                 .resizable()
                 .ignoresSafeArea()
             
-            VStack(spacing: 40) {
+            VStack(spacing: 60) {
                 
                 
                 HStack {
@@ -53,13 +52,13 @@ struct QuestionView: View {
                     }
                 }
                 
-                Button {
-                    triviaGame.goToNextQuestion()
-                    
-                } label: {
-                    PrimaryButton(text: "Next", background: triviaGame.answerSelected ? Color(.white) : .gray)
-                }
-                .disabled(!triviaGame.answerSelected)
+//                Button {
+//                    triviaGame.goToNextQuestion()
+//                    
+//                } label: {
+//                    PrimaryButton(text: "Next", background: triviaGame.answerSelected ? Color(.white) : .gray)
+//                }
+//                .disabled(!triviaGame.answerSelected)
                 
                 Spacer()
             }

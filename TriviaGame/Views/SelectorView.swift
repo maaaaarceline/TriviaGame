@@ -12,7 +12,7 @@ struct SelectorView: View {
     @StateObject var triviaManager = TriviaManager()
     
     var body: some View {
-        NavigationView {
+        NavigationStack() {
             
             ZStack {
                 
@@ -21,13 +21,26 @@ struct SelectorView: View {
                     .aspectRatio(contentMode: .fill)
                     .ignoresSafeArea()
                 
-                VStack {
+                VStack(spacing: 60) {
                     
-                    Text("Quiz Settings").formattedTitle()
-                        .foregroundStyle(.white)
-                        .padding()
+                    HStack {
+                        
+//                        Button {
+//                            
+//                            
+//                        } label: {
+//                            Image(systemName: "arrowshape.backward.fill")
+//                                .resizable()
+//                                .frame(width: 30, height: 30)
+//                                .offset(x: -40)
+//                        }
+                        
+                        Text("Quiz Settings").formattedTitle()
+                            .foregroundStyle(.white)
+                            .padding()
+                    }
                     
-                    Spacer()
+                    //Spacer()
                     
                     VStack(spacing: 20) {
                         
@@ -84,7 +97,7 @@ struct SelectorView: View {
                     }
                     .padding()
                     
-                    Spacer()
+                    //Spacer()
                     
                     NavigationLink(destination: TriviaView().environmentObject(triviaManager)
                         .onAppear() {
@@ -99,8 +112,7 @@ struct SelectorView: View {
                     
                 }
             }
-        }
-        .navigationBarHidden(true)
+        } .navigationBarBackButtonHidden(true)
         
     }
 }

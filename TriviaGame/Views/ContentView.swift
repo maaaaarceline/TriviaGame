@@ -31,12 +31,12 @@ struct ContentView: View {
                 }
                 
                 NavigationLink {
-                    SelectorView().environmentObject(triviaManager)
+                    ModeSelectorView().environmentObject(triviaManager)
                 } label : {
                     PrimaryButton(text: "Let's Go!")
                 }
                 
-                //if triviaManager.getHighScore() > 0 {
+                if triviaManager.getHighScore() > 0 {
                     Text("Best Score")
                         .formattedTitle()
                         .foregroundStyle(.white)
@@ -60,7 +60,7 @@ struct ContentView: View {
                         )
                     
                     }
-                //}
+                }
                 
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

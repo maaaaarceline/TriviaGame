@@ -22,11 +22,13 @@ class TriviaManager: ObservableObject {
     @Published private(set) var progress: CGFloat = 0.00
     @Published private(set) var score = 0
     
-    @Published var timeRemaining = 20
+    @Published var timeRemaining: Int = 20
     @Published private(set) var angle: Double = 0
     @Published private(set) var fillAmount: CGFloat = 0
     
     private var timer: Timer?
+    
+    @Published var normalGameMode = true
     
     // Trivia settings
     @Published var difficulty = "easy"
@@ -62,6 +64,7 @@ class TriviaManager: ObservableObject {
         "Cartoon & Animations": "32"
     ]
     let questionAmount = [5, 10, 15, 20, 25, 50]
+    
     
     func saveHighScore() {
         let currentScore = score
@@ -144,21 +147,26 @@ class TriviaManager: ObservableObject {
     
     func starTimer() {
         timer?.invalidate()
+        
         fillAmount = 0
         angle = 0
         
-        withAnimation(.easeOut(duration: 20)) {
+        let duration = normalGameMode ? 20 : 60
+        timeRemaining = Int(Double(duration))
+        
+        withAnimation(.linear(duration: Double(duration))) {
             fillAmount = 1
             angle += 360
         }
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { [weak self] _ in
             guard let self = self else { return }
+            
             if self.timeRemaining > 0 {
                 self.timeRemaining -= 1
             } else {
                 self.timer?.invalidate()
                 resetTimerVisuals()
-                self.goToNextQuestion()
+                self.reachedEnd = true
             }
         })
     }
@@ -191,17 +199,31 @@ class TriviaManager: ObservableObject {
             let currentTriviaQuestion = trivia[index]
             question = currentTriviaQuestion.formattedQuestion
             answerChoices = currentTriviaQuestion.answers
-            timeRemaining = 20
-            starTimer()
+            
+            if normalGameMode {
+                starTimer()
+            }
         }
     }
     
     func selectAnswer(answer: Answer) {
         answerSelected = true
+        
         if answer.isCorrect {
             score += 1
         }
-        timer?.invalidate()
-        resetTimerVisuals()
+        
+        if normalGameMode {
+            timer?.invalidate()
+            resetTimerVisuals()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            self.goToNextQuestion()
+        }
     }
+}
+
+class NavigatorCoordinator: ObservableObject {
+    @Published var path = NavigationPath()
 }
